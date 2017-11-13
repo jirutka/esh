@@ -1,0 +1,34 @@
+= ESH – Embedded SHell
+:script-name: esh
+:script-sha1: N/A
+:gh-name: jirutka/{script-name}
+:version: 0.0.0
+
+ifdef::env-github[]
+image:https://travis-ci.org/{gh-name}.svg?branch=master["Build Status", link="https://travis-ci.org/{gh-name}"]
+endif::env-github[]
+
+TODO
+
+
+== Requirements
+
+TODO
+
+
+== Usage
+
+Read documentation in the link:{script-name}[{script-name} script].
+
+You can add {script-name} as a submodule into your repository or download it on demand, e.g.:
+
+[source, sh, subs="+attributes"]
+wget https://raw.githubusercontent.com/{gh-name}/v{version}/{script-name} \
+    && echo '{script-sha1}  {script-name}' | sha1sum -c \
+    || exit 1
+
+
+== License
+
+This project is licensed under http://opensource.org/licenses/MIT/[MIT License].
+For the full text of the license, see the link:LICENSE[LICENSE] file.
