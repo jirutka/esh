@@ -1,0 +1,4 @@
+sudo: false
+language: minimal
+script:
+  - make test
