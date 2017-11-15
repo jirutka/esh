@@ -1,0 +1,203 @@
+#!/bin/sh
+# vim: set ts=4:
+#---help---
+# Usage:
+#   esh [options] [--] INPUT [VARIABLE ...]
+#   esh <-h | -V>
+#
+# Process and evaluate an ESH template.
+#
+# Arguments:
+#   INPUT      Path of the template file or "-" to read from STDIN.
+#   VARIABLE   Variable(s) specified as NAME=VALUE to pass into the template
+#              (the have higher priority than environment variables).
+#
+# Options:
+#   -d         Don't evaluate template, just dump a shell script.
+#   -o FILE    Output file or "-" for STDOUT. Defaults to "-".
+#   -s SHELL   Command name or path of the shell to use for template
+#              evaluation. It must not contain spaces. Defaults to "/bin/sh".
+#   -h         Show this help message and exit.
+#   -V         Print version and exit.
+#
+# Environment Variables:
+#   ESH_AWK    Command name of path of the awk program to use.
+#              It must not contain spaces. Defaults to "awk".
+#   ESH_SHELL  Same as -s.
+#
+# Please report bugs at <https://github.com/jirutka/esh/issues>.
+#---help---
+set -eu
+
+# Set pipefail if supported.
+if ( set -o pipefail 2>/dev/null ); then
+    set -o pipefail
+fi
+
+readonly PROGNAME='esh'
+readonly VERSION='0.0.0'
+
+readonly AWK_PROGRAM=$(cat <<'AWK'
+function fputs(str) {
+	printf("%s", str)
+}
+function read(len,  _str) {
+	if (len == "") {
+		_str = buff
+		buff = ""
+	} else if (len > 0) {
+		_str = substr(buff, 1, len)
+		buff = substr(buff, len + 1, length(buff))
+	}
+	return _str
+}
+function skip(len) {
+	buff = substr(buff, len + 1, length(buff))
+}
+function flush(len,  _str) {
+	_str = read(len)
+
+	if (state == "TEXT") {
+		gsub("'", "'\\''", _str)
+	}
+	if (state != "COMMENT") {
+		fputs(_str)
+	}
+}
+BEGIN {
+	FS = ""
+	buff = ""
+
+	if (shell) {
+		print("#!" (shell ~ /\// ? shell : "/usr/bin/env " shell))
+	}
+	print("set -eu")
+	print("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
+	print("__print() { printf '%s' \"$*\"; }")
+	print(vars)
+
+	fputs("\nprintf '%s' '")
+	state = "TEXT"
+}
+{
+	buff = $0
+	while (buff != "") {
+		print_nl = 1
+
+		if (state == "TEXT" && match(buff, /<%/)) {
+			flush(RSTART - 1)  # print buff before "<%"
+			skip(2)  # skip "<%"
+
+			flag = substr(buff, 1, 1)
+			if (flag != "%") {
+				fputs("'\n")  # close text
+			}
+			if (flag == "%") {  # <%%
+				skip(1)
+				fputs("<%")
+			} else if (flag == "=") {  # <%=
+				skip(1)
+				fputs("__print ")
+				state = "TAG"
+			} else if (flag == "#") {  # <%#
+				state = "COMMENT"
+			} else {
+				state = "TAG"
+			}
+		} else if (state != "TEXT" && match(buff, /%>/)) {
+			flag = RSTART > 1 ? substr(buff, RSTART - 1, 1) : ""
+
+			if (flag == "%") {  # %%>
+				flush(RSTART - 2)
+				skip(1)
+				flush(2)
+			} else if (flag == "-") {  # -%>
+				flush(RSTART - 2)
+				skip(3)
+				print_nl = 0
+			} else {  # %>
+				flush(RSTART - 1)
+				skip(2)
+			}
+			if (flag != "%") {
+				fputs("\nprintf '%s' '")
+				state = "TEXT"
+			}
+		} else {
+			flush()
+		}
+	}
+	if (print_nl && state != "COMMENT") {
+		fputs("\n")
+	}
+}
+END {
+	if (state == "TEXT") {
+		fputs("'\n")
+	}
+}
+AWK
+)
+
+help() {
+	sed -En '/^#---help---/,/^#---help---/p' "$0" | sed -E 's/^# ?//; 1d;$d;'
+	exit ${1:-0}
+}
+
+convert() {
+	local input="$1"
+	local vars="$2"
+	local evaluate="${3:-yes}"
+
+	if [ "$evaluate" = yes ]; then
+		$ESH_AWK -v vars="$vars" -- "$AWK_PROGRAM" "$input" | $ESH_SHELL -s
+	else
+		$ESH_AWK -v vars="$vars" -v shell="$ESH_SHELL" -- "$AWK_PROGRAM" "$input"
+	fi
+}
+
+: ${ESH_AWK:="awk"}
+: ${ESH_SHELL:="/bin/sh"}
+EVALUATE='yes'
+OUTPUT=''
+
+while getopts 'dho:s:V' OPT; do
+	case "$OPT" in
+		d) EVALUATE=no;;
+		h) help 0;;
+		o) OUTPUT="$OPTARG";;
+		s) ESH_SHELL="$OPTARG";;
+		V) echo "$PROGNAME $VERSION"; exit 0;;
+		'?') help 1 >&2;;
+	esac
+done
+shift $(( OPTIND - 1 ))
+
+[ $# -ge 1 ] || help 1 >&2
+
+INPUT="$1"; shift
+[ "$INPUT" != '-' ] || INPUT=''
+
+# Validate arguments.
+for arg in "$@"; do
+	case "$arg" in
+		*=*) ;;
+		*) echo "$PROGNAME: illegal argument: $arg" >&2; exit 1;;
+	esac
+done
+
+# Format variables into shell variable assignments.
+vars=''; for item in "$@"; do
+	vars="$vars\n${item%%=*}='$(
+		printf %s "${item#*=}" | $ESH_AWK "{ gsub(/'/, \"'\\\\\\\''\"); print }"
+	)'"
+done
+
+if [ "${OUTPUT#-}" ]; then
+	tmpfile="$(mktemp)"
+	trap "rm -f '$tmpfile'" EXIT HUP INT TERM
+	convert "$INPUT" "$vars" "$EVALUATE" > "$tmpfile"
+	mv "$tmpfile" "$OUTPUT"
+else
+	convert "$INPUT" "$vars" "$EVALUATE"
+fi
