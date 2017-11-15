@@ -1,0 +1,5 @@
+Text between <% and %> tokens is evaluated by the shell.
+<%= is a syntactic sugar for <% __print ... %>.
+<%# is a comment that will be omitted from the output.
+
+Use %%> inside a tag as escaped %> or -%%> to escape -%>.

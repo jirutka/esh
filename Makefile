@@ -18,6 +18,10 @@ bump-version:
 	$(SED) -E -i "s/^(readonly VERSION)=.*/\1='$(VERSION)'/" $(SCRIPT_NAME)
 	$(SED) -E -i "s/^(:version:).*/\1 $(VERSION)/" README.adoc
 
+#: Clean all temporary files.
+clean:
+	find tests -name '*.err' -delete
+
 #: Install the script into $DESTDIR.
 install:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -36,6 +40,10 @@ release: .check-git-clean | bump-version readme-update-checksum
 	git commit -m "Release version $(VERSION)"
 	git tag -s v$(VERSION) -m v$(VERSION)
 
+#: Run tests.
+test:
+	@./tests/run-tests
+
 #: Print list of targets.
 help:
 	@printf '%s\n\n' 'List of targets:'
@@ -46,4 +54,5 @@ help:
 	@test -z "$(shell git status --porcelain)" \
 		|| { echo 'You have uncommitted changes!' >&2; exit 1; }
 
-.PHONY: bump-version install readme-update-checksum release help .check-git-clean
+.PHONY: bump-version clean install readme-update-checksum release test help \
+	.check-git-clean

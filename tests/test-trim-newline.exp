@@ -1,0 +1,5 @@
+This should be on 1 line.
+
+Trim has no effect when -%> is not the last token on the line.
+
+0...1...2...3

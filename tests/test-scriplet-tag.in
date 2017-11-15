@@ -1,0 +1,4 @@
+<% if true; then %>Lorem ipsum dolor sit amet,<% fi %>
+consectetur <% printf "adipiscing elit." %>
+
+<% answer=42 %>The answer is: <% printf "$answer" %>.

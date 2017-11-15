@@ -1,0 +1,6 @@
+<%# Ignore this comment %>Lorem ipsum dolor sit amet,
+consectetur<%# and this too %> adipiscing elit,
+sed do eiusmod tempor incididunt.<%# also this one %>
+
+<%# That's right, this one should be also ignored. %>
+Ut enim ad minim veniam.

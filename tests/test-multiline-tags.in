@@ -1,0 +1,11 @@
+<%#
+  Sure, you can spread tags over multiple lines!
+-%>
+Hello, <% case "$TEST_NAME" in
+            *-multiline-tags) printf 'world';;
+            *) printf 'WAT?!';;
+          esac %>!
+
+<%= \
+    "$TEST_NAME"
+%>

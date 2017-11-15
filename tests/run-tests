@@ -1,0 +1,52 @@
+#!/bin/sh
+# vim: set ts=4:
+set -eu
+
+hr() {
+	printf '%s\n' $(yes "$1" | head -n 72 | tr -d '\n')
+}
+
+cd "$(dirname "$0")"
+
+export PATH="$(pwd)/..:$PATH"
+
+passed=0
+failed=0
+
+for name in $(ls -1 test-* | sed 's/\.[a-z]*$//' | uniq); do
+	test_script="$name.t"
+	[ -e "$test_script" ] || test_script='diff-test'
+
+	printf %-26s "$name" | tr ' ' '.'
+
+	rm -f "$name.err"
+	if TEST_NAME="$name" ./"$test_script" > "$name.err" 2>&1; then
+		rm  -f "$name.err"
+		printf ' OK\n'
+		passed=$(( passed + 1 ))
+	else
+		printf ' FAIL\n'
+		failed=$(( failed + 1 ))
+	fi
+done
+
+printf '\n'
+
+for err_file in $(find * -name 'test-*.err'); do
+	name="${err_file%.err}"
+
+	hr '='
+	printf 'FAILED: %s\n' "$name"
+	hr '-'
+	cat "$err_file"
+	hr '='
+	printf '\n'
+done
+
+if [ $failed -gt 0 ]; then
+	printf 'FAILED %d/%d\n' $failed $(( passed + failed ))
+	exit 1
+else
+	printf 'PASSED %d/%d\n' $passed $passed
+	exit 0
+fi

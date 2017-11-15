@@ -1,0 +1,10 @@
+<%# This comment should not generate a newline -%>
+This should be on <%= 1 -%>
+ line.
+
+Trim has no effect when -%> is not <%= the last -%> token on the line.
+
+<% for i in $(seq 0 2); do -%>
+<%= $i... -%>
+<% done -%>
+3

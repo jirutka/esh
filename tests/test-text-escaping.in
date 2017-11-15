@@ -1,0 +1,4 @@
+Single quote ' must be escaped.
+The same for escaped quote like \', \\', \\\' or \\\.
+Shell '$(substitutions)' should not work here.
+What about \n or \\n?
