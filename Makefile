@@ -3,7 +3,9 @@ SCRIPT_NAME := esh
 DESTDIR := /
 prefix := /usr/local
 bindir := $(prefix)/bin
+mandir := $(prefix)/share/man
 
+ASCIIDOCTOR := asciidoctor
 SED := sed
 SHA1SUM := sha1sum
 
@@ -11,6 +13,9 @@ ifeq ($(shell uname -s),Darwin)
 	SED := gsed
 	SHA1SUM := shasum -a 1
 endif
+
+$(SCRIPT_NAME).1: $(SCRIPT_NAME).1.adoc
+	$(ASCIIDOCTOR) -b manpage $(SCRIPT_NAME).1.adoc
 
 #: Update version in the script and README.adoc to $VERSION.
 bump-version:
@@ -20,12 +25,18 @@ bump-version:
 
 #: Clean all temporary files.
 clean:
+	rm -f $(SCRIPT_NAME).1
 	find tests -name '*.err' -delete
 
-#: Install the script into $DESTDIR.
-install:
+#: Install the script and man page into $DESTDIR.
+install: $(SCRIPT_NAME).1
 	mkdir -p $(DESTDIR)$(bindir)
 	install -m 755 $(SCRIPT_NAME) $(DESTDIR)$(bindir)/$(SCRIPT_NAME)
+	mkdir -p $(DESTDIR)$(mandir)/man1
+	install -m 644 $(SCRIPT_NAME).1 $(DESTDIR)$(mandir)/man1/$(SCRIPT_NAME).1
+
+#: Generate a man page.
+man: $(SCRIPT_NAME).1
 
 #: Update variable :script-sha1: in README.adoc with SHA1 checksum of the script.
 readme-update-checksum:
@@ -54,5 +65,5 @@ help:
 	@test -z "$(shell git status --porcelain)" \
 		|| { echo 'You have uncommitted changes!' >&2; exit 1; }
 
-.PHONY: bump-version clean install readme-update-checksum release test help \
-	.check-git-clean
+.PHONY: bump-version clean install man readme-update-checksum release test \
+	help .check-git-clean
