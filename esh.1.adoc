@@ -1,0 +1,134 @@
+= ESH(1)
+:doctype: manpage
+
+
+== NAME
+
+esh - simple template system based on shell
+
+
+== SYNOPSIS
+
+*esh* [-d] [-o _output_] [-s _shell_] [--] _file_ [_variable_ _..._]
+
+*esh* \<-h | -V>
+
+
+== DESCRIPTION
+
+*esh* (embedded shell) is a templating engine for evaluating shell commands embedded in arbitrary templates.
+It's like ERB (Embedded RuBy) for shell, intended to be used for templating configuration files.
+
+*esh* converts template _file_, or _stdin_ if _file_ is "`-`", into a sequence of shell commands.
+Commands between _<%_ and _%>_ tags are passed as-is, everything else is escaped and prefixed with *printf* command.
+These commands are eventually evaluated using _shell_ (unless *-d* is specified).
+
+
+== OPTIONS
+
+*-d*::
+  Don't evaluate template, just dump a shell script.
+
+*-o* _file_::
+  Output file or "`-`" for STDOUT.
+  Defaults to "`-`".
+
+*-s* _shell_::
+  Command name or path of the shell to use for template evaluation.
+  It must not contain spaces.
+  Defaults to "`/bin/sh`".
+
+*-h*::
+  Show help message and exit.
+
+*-V*::
+  Print version and exit.
+
+
+== ENVIRONMENT
+
+*esh* may be configured using the following environment variables:
+
+ESH_AWK::
+  Command name of path of the awk program to use.
+  It must not contain spaces.
+  Defaults to "`awk`".
+
+ESH_SHELL::
+  The same as *-s* _shell_.
+
+
+== EXIT STATUS
+
+*esh* exits with the exit status of _shell_ or awk.
+
+
+== TEMPLATE SYNTAX
+
+ESH has two tags for shell code, a tag for comments, and a way to escape tag delimiters.
+
+<% commands %>::
+  Executes the _commands_ and replaces this tag with its output on _stdout_.
+
+<%= values %>::
+  Executes _printf '%s '_ with the _values_ as arguments and replaces this tag with the output (without trailing white space).
+  _values_ are not quoted or escaped, so all shell substitutions are applied.
+
+<%# comment %>::
+  Removed from the final output.
+
+-%>::
+  May be used instead of _%>_.
+  It trims the following line break if used at the end of line, otherwise has no trimming effect.
+
+<%%::
+  A literal _<%_ when used outside of the above tags.
+
+%%>::
+  A literal _%>_ when used inside of the above tags.
+
+Opening and closing tag may not be at the same line.
+
+Text outside a tag becomes literal text, but it is subject to any tagged shell code surrounding it.
+For example, text surrounded by a tagged *if* statement only appears in the output if the condition is true.
+
+
+== EXAMPLES
+
+[source, nginx]
+.nginx.conf
+----
+http {
+    resolver <%= $(sed -En 's/^nameserver ([^#]+)/\1/p' /etc/resolv.conf) %>;
+
+    <% if nginx -V 2>&1 | grep -q lua-nginx-module; then -%>
+    lua_package_path '<%= $(pkg-config --variable=INSTALL_LMOD lua) %>/?.lua';
+    <% fi -%>
+
+    <% if [ -e /etc/ssl/dh2048.pem ]; then -%>
+    ssl_dhparam /etc/ssl/dh2048.pem;
+    <% fi -%>
+
+    <%# The rest of the config is omitted %>
+}
+----
+
+To generate the resulting configuration file run:
+
+[source, sh]
+esh -o nginx.conf nginx.conf.esh
+
+
+== AUTHORS
+
+*esh*'s author is Jakub Jirutka.
+
+
+== REPORTING BUGS
+
+Report bugs to the project's issue tracker at https://github.com/jirutka/esh/issues.
+
+
+== SEE ALSO
+
+sh(1)
