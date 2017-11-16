@@ -8,12 +8,16 @@ ifdef::env-github[]
 image:https://travis-ci.org/{gh-name}.svg?branch=master["Build Status", link="https://travis-ci.org/{gh-name}"]
 endif::env-github[]
 
-TODO
+*esh* (embedded shell) is a templating engine for evaluating shell commands embedded in arbitrary templates.
+It's like ERB (Embedded RuBy) for shell, intended to be used for templating configuration files.
+
+esh is implemented in ~160 lines (LoC) of shell and awk.
 
 
 == Requirements
 
-TODO
+* http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html[POSIX-sh] compatible shell (e.g. Busybox ash, dash, ZSH, bash, …)
+* common Unix userland with `awk` and `sed` (e.g. from Busybox, GNU, …)
 
 
 == Usage
@@ -26,6 +30,13 @@ You can add {script-name} as a submodule into your repository or download it on 
 wget https://raw.githubusercontent.com/{gh-name}/v{version}/{script-name} \
     && echo '{script-sha1}  {script-name}' | sha1sum -c \
     || exit 1
+
+
+== Credits
+
+ESH template syntax is based on ERB (Embedded Ruby).
+
+Tests and some concepts are inspired by https://github.com/jwilk/shellcat[shellcat].
 
 
 == License
