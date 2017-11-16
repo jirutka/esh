@@ -18,7 +18,7 @@ TODO
 
 == Usage
 
-Read documentation in the link:{script-name}[{script-name} script].
+Read man page link:{script-name}.1.adoc[{script-name}(1)].
 
 You can add {script-name} as a submodule into your repository or download it on demand, e.g.:
 
