@@ -37,7 +37,7 @@ fi
 readonly PROGNAME='esh'
 readonly VERSION='0.0.0'
 
-readonly AWK_PROGRAM=$(cat <<'AWK'
+AWK_PROGRAM=$(cat <<'AWK'
 function fputs(str) {
 	printf("%s", str)
 }
@@ -138,6 +138,7 @@ END {
 }
 AWK
 )
+readonly AWK_PROGRAM
 
 help() {
 	sed -En '/^#---help---/,/^#---help---/p' "$0" | sed -E 's/^# ?//; 1d;$d;'
