@@ -35,7 +35,7 @@ if ( set -o pipefail 2>/dev/null ); then
 fi
 
 readonly PROGNAME='esh'
-readonly VERSION='0.0.0'
+readonly VERSION='0.1.0'
 
 AWK_PROGRAM=$(cat <<'AWK'
 function fputs(str) {
