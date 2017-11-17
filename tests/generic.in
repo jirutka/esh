@@ -1,0 +1,6 @@
+<%# This should not appear in the output -%>
+Hello from <%= $TEST_NAME %>!
+
+<% if [ 1 = 1 ]; then -%>
+This is an ESH template.
+<% fi -%>

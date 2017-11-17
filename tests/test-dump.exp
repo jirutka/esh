@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi
+__print() { printf '%s' "$*"; }
+
+
+printf '%s' ''
+
+printf '%s' 'Hello from '
+__print  $TEST_NAME 
+printf '%s' '!
+
+'
+ if [ 1 = 1 ]; then 
+printf '%s' 'This is an ESH template.
+'
+ fi 
+printf '%s' ''
