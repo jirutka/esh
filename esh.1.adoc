@@ -96,17 +96,15 @@ For example, text surrounded by a tagged *if* statement only appears in the outp
 == EXAMPLES
 
 [source, nginx]
-.nginx.conf
+.nginx.conf.esh
 ----
 http {
+    access_log <%= $logs_dir/access.log %> main;
+
     resolver <%= $(sed -En 's/^nameserver ([^#]+)/\1/p' /etc/resolv.conf) %>;
 
     <% if nginx -V 2>&1 | grep -q lua-nginx-module; then -%>
     lua_package_path '<%= $(pkg-config --variable=INSTALL_LMOD lua) %>/?.lua';
-    <% fi -%>
-
-    <% if [ -e /etc/ssl/dh2048.pem ]; then -%>
-    ssl_dhparam /etc/ssl/dh2048.pem;
     <% fi -%>
 
     <%# The rest of the config is omitted %>
@@ -116,7 +114,7 @@ http {
 To generate the resulting configuration file run:
 
 [source, sh]
-esh -o nginx.conf nginx.conf.esh
+esh -o nginx.conf nginx.conf.esh logs_dir=/var/log/nginx
 
 
 == AUTHORS
