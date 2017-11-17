@@ -32,6 +32,24 @@ wget https://raw.githubusercontent.com/{gh-name}/v{version}/{script-name} \
     || exit 1
 
 
+== Examples
+
+[source, nginx]
+----
+http {
+    access_log <%= $logs_dir/access.log %> main;
+
+    resolver <%= $(sed -En 's/^nameserver ([^#]+)/\1/p' /etc/resolv.conf) %>;
+
+    <% if nginx -V 2>&1 | grep -q lua-nginx-module; then -%>
+    lua_package_path '<%= $(pkg-config --variable=INSTALL_LMOD lua) %>/?.lua';
+    <% fi -%>
+
+    <%# The rest of the config is omitted %>
+}
+----
+
+
 == Credits
 
 ESH template syntax is based on ERB (Embedded Ruby).
