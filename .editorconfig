@@ -12,3 +12,7 @@ trim_trailing_whitespace = true
 [*.{adoc,yml}]
 indent_size = 2
 indent_style = space
+
+[tests/*.{in,exp}]
+insert_final_newline = false
+trim_trailing_whitespace = false
