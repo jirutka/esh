@@ -1,4 +1,16 @@
 sudo: false
 language: minimal
+addons:
+  apt:
+    packages:
+      - original-awk
+      - zsh
+env:
+  matrix:
+    - ESH_SHELL="/bin/busybox ash" ESH_AWK="/bin/busybox awk"
+    - ESH_SHELL="/bin/dash"
+    - ESH_SHELL="/bin/bash"
+    - ESH_SHELL="/bin/zsh5"
+    - ESH_AWK="/usr/bin/original-awk"
 script:
-  - make test
+  - ESH="$ESH_SHELL $(pwd)/esh" make test
