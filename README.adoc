@@ -18,6 +18,7 @@ esh is implemented in ~160 lines (LoC) of shell and awk.
 
 * http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html[POSIX-sh] compatible shell (e.g. Busybox ash, dash, ZSH, bash, …)
 * common Unix userland with `awk` and `sed` (e.g. from Busybox, GNU, …)
+* (https://github.com/asciidoctor/asciidoctor[Asciidoctor] to build a man page)
 
 
 == Usage
