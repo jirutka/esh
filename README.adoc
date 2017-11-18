@@ -1,4 +1,5 @@
 = ESH – Embedded SHell
+:source-language: sh
 :script-name: esh
 :script-sha1: f12b7b1d21bc0b091425bbbabe007691c79deada
 :gh-name: jirutka/{script-name}
@@ -21,16 +22,51 @@ esh is implemented in ~160 lines (LoC) of shell and awk.
 * (https://github.com/asciidoctor/asciidoctor[Asciidoctor] to build a man page)
 
 
-== Usage
+== Installation
 
-Read man page link:{script-name}.1.adoc[{script-name}(1)].
+=== Alpine Linux
+
+Install package *{script-name}* from the Alpine’s community repository:
+
+[source, subs="+attributes"]
+apk add {script-name}
+
+IMPORTANT: This package is in Alpine stable since v3.7. You can also install it from _edge_ (unstable) branch.
+
+
+=== On CI
 
 You can add {script-name} as a submodule into your repository or download it on demand, e.g.:
 
-[source, sh, subs="+attributes"]
+[source, subs="+attributes"]
 wget https://raw.githubusercontent.com/{gh-name}/v{version}/{script-name} \
     && echo '{script-sha1}  {script-name}' | sha1sum -c \
     || exit 1
+
+
+=== Manually
+
+. Download and unpack release tarball:
+[source, subs="+attributes"]
+wget https://github.com/{gh-name}/archive/v{version}/{script-name}-{version}.tar.gz
+tar -xzf {script-name}-{version}.tar.gz
+cd {script-name}-{version}
+
+. Run tests:
+[source]
+make test
+
+. Build a man page and install esh:
++
+[source]
+make install prefix=/usr/local DESTDIR=/
++
+or just copy `esh` whether you want, it’s a plain shell script.
+
+
+== Usage
+
+Read man page link:{script-name}.1.adoc[{script-name}(1)].
 
 
 == Examples
