@@ -14,6 +14,9 @@ ifeq ($(shell uname -s),Darwin)
 	SHA1SUM := shasum -a 1
 endif
 
+# The default target.
+all: help
+
 $(SCRIPT_NAME).1: $(SCRIPT_NAME).1.adoc
 	$(ASCIIDOCTOR) -b manpage $(SCRIPT_NAME).1.adoc
 
@@ -74,5 +77,5 @@ help:
 	@test -z "$(shell git status --porcelain)" \
 		|| { echo 'You have uncommitted changes!' >&2; exit 1; }
 
-.PHONY: bump-version clean install install-data install-exec install-man man \
+.PHONY: all bump-version clean install install-data install-exec install-man man \
 	readme-update-checksum release test help .check-git-clean
