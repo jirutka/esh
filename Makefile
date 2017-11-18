@@ -17,12 +17,6 @@ endif
 # The default target.
 all: help
 
-$(SCRIPT_NAME).1: $(SCRIPT_NAME).1.adoc
-	$(ASCIIDOCTOR) -b manpage $(SCRIPT_NAME).1.adoc
-
-# Target for compatibility with GNU convention.
-install-data: install-man
-
 #: Update version in the script and README.adoc to $VERSION.
 bump-version:
 	test -n "$(VERSION)"  # $$VERSION
@@ -72,6 +66,14 @@ help:
 	@printf '%s\n\n' 'List of targets:'
 	@$(SED) -En '/^#:.*/{ N; s/^#: (.*)\n([A-Za-z0-9_-]+).*/\2 \1/p }' $(MAKEFILE_LIST) \
 		| while read label desc; do printf '%-30s %s\n' "$$label" "$$desc"; done
+
+
+# Convert a man page.
+$(SCRIPT_NAME).1: $(SCRIPT_NAME).1.adoc
+	$(ASCIIDOCTOR) -b manpage $(SCRIPT_NAME).1.adoc
+
+# Target for compatibility with GNU convention.
+install-data: install-man
 
 .check-git-clean:
 	@test -z "$(shell git status --porcelain)" \
