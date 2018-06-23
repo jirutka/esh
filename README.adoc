@@ -34,6 +34,12 @@ apk add {script-name}
 IMPORTANT: This package is in Alpine stable since v3.7. You can also install it from _edge_ (unstable) branch.
 
 
+=== Fedora
+
+[source, subs="+attributes"]
+dnf install {script-name}
+
+
 === On CI
 
 You can add {script-name} as a submodule into your repository or download it on demand, e.g.:
