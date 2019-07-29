@@ -194,6 +194,8 @@ vars=''; for item in "$@"; do
 	)'"
 done
 
+export ESH="$0"
+
 if [ "${OUTPUT#-}" ]; then
 	tmpfile="$(mktemp)"
 	trap "rm -f '$tmpfile'" EXIT HUP INT TERM

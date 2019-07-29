@@ -57,6 +57,11 @@ ESH_AWK::
 ESH_SHELL::
   The same as *-s* _shell_.
 
+The following extra environment variables are available inside the template and for the processes spawned by *esh*:
+
+ESH::
+  Path of the *esh* interpreter.
+
 
 == EXIT STATUS
 
