@@ -68,13 +68,13 @@ BEGIN {
 	FS = ""
 	buff = ""
 
-	if (shell) {
-		print("#!" (shell ~ /\// ? shell : "/usr/bin/env " shell))
+	if (SHELL) {
+		print("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
 	}
 	print("set -eu")
 	print("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
 	print("__print() { printf '%s' \"$*\"; }")
-	print(vars)
+	print(VARS)
 
 	fputs("\nprintf '%s' '")
 	state = "TEXT"
@@ -151,9 +151,9 @@ convert() {
 	local evaluate="${3:-yes}"
 
 	if [ "$evaluate" = yes ]; then
-		$ESH_AWK -v vars="$vars" -- "$AWK_PROGRAM" "$input" | $ESH_SHELL -s
+		$ESH_AWK -v VARS="$vars" -- "$AWK_PROGRAM" "$input" | $ESH_SHELL -s
 	else
-		$ESH_AWK -v vars="$vars" -v shell="$ESH_SHELL" -- "$AWK_PROGRAM" "$input"
+		$ESH_AWK -v VARS="$vars" -v SHELL="$ESH_SHELL" -- "$AWK_PROGRAM" "$input"
 	fi
 }
 
