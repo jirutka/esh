@@ -49,17 +49,17 @@ These commands are eventually evaluated using _shell_ (unless *-d* is specified)
 
 *esh* may be configured using the following environment variables:
 
-ESH_AWK::
+*ESH_AWK*::
   Command name of path of the awk program to use.
   It must not contain spaces.
   Defaults to "`awk`".
 
-ESH_SHELL::
+*ESH_SHELL*::
   The same as *-s* _shell_.
 
 The following extra environment variables are available inside the template and for the processes spawned by *esh*:
 
-ESH::
+*ESH*::
   Path of the *esh* interpreter.
 
 
@@ -67,9 +67,9 @@ ESH::
 
 *esh* exits with the exit status of _shell_ or awk unless some error has encountered before converting the template.
 
-* 0  - Clean exit, no error has encountered.
-* 1  - Generic error.
-* 10 - Invalid usage.
+* *0*  - Clean exit, no error has encountered.
+* *1*  - Generic error.
+* *10* - Invalid usage.
 
 
 == TEMPLATE SYNTAX
