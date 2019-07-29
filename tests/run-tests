@@ -3,7 +3,12 @@
 set -eu
 
 hr() {
-	printf '%s\n' $(yes "$1" | head -n 72 | tr -d '\n')
+	local char=$1
+	local text=${2:+" $2 "}
+	local text_len=$(printf %s "$text" | wc -c)
+	local chars=$(yes "$char" | head -n $(((72 - $text_len) / 2)) | tr -d '\n')
+
+	printf '%s%s%s\n' "$chars" "$text" "$chars"
 }
 
 cd "$(dirname "$0")"
@@ -13,15 +18,15 @@ export PATH="$(pwd)/..:$PATH"
 passed=0
 failed=0
 
-for name in $(ls -1 test-* | sed 's/\.[a-z]*$//' | uniq); do
+for name in $(ls -1 test-* | sed 's/\.[a-z0-9]*$//' | uniq); do
 	test_script="$name.t"
 	[ -e "$test_script" ] || test_script='diff-test'
 
 	printf %-26s "$name" | tr ' ' '.'
 
 	rm -f "$name.err"
-	if TEST_NAME="$name" ./"$test_script" > "$name.err" 2>&1; then
-		rm  -f "$name.err"
+	if TEST_NAME="$name" ./"$test_script" > "$name.err" 2> "$name.err2"; then
+		rm  -f "$name".err*
 		printf ' OK\n'
 		passed=$(( passed + 1 ))
 	else
@@ -37,8 +42,12 @@ for err_file in $(find * -name 'test-*.err'); do
 
 	hr '='
 	printf 'FAILED: %s\n' "$name"
-	hr '-'
+	hr '-' 'stdout'
 	cat "$err_file"
+	printf '\n'
+	hr '-' 'stderr'
+	cat "${err_file}2"
+	printf '\n'
 	hr '='
 	printf '\n'
 done
