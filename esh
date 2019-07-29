@@ -169,7 +169,7 @@ while getopts 'dho:s:V' OPT; do
 		o) OUTPUT="$OPTARG";;
 		s) ESH_SHELL="$OPTARG";;
 		V) echo "$PROGNAME $VERSION"; exit 0;;
-		'?') help 1 >&2;;
+		'?') help 10 >&2;;
 	esac
 done
 shift $(( OPTIND - 1 ))
@@ -183,7 +183,7 @@ INPUT="$1"; shift
 for arg in "$@"; do
 	case "$arg" in
 		*=*) ;;
-		*) echo "$PROGNAME: illegal argument: $arg" >&2; exit 1;;
+		*) echo "$PROGNAME: illegal argument: $arg" >&2; exit 10;;
 	esac
 done
 
