@@ -2,21 +2,21 @@
 # vim: set ts=4:
 #---help---
 # USAGE:
-#   esh [options] [--] INPUT [VARIABLE ...]
+#   esh [options] [--] <input> [<variable>...]
 #   esh <-h | -V>
 #
 # Process and evaluate an ESH template.
 #
 # ARGUMENTS:
-#   INPUT          Path of the template file or "-" to read from STDIN.
-#   VARIABLE       Variable(s) specified as NAME=VALUE to pass into the
+#   <input>        Path of the template file or "-" to read from STDIN.
+#   <variable>     Variable(s) specified as <name>=<value> to pass into the
 #                  template (the have higher priority than environment
 #                  variables).
 #
 # OPTIONS:
 #   -d             Don't evaluate template, just dump a shell script.
-#   -o FILE        Output file or "-" for STDOUT. Defaults to "-".
-#   -s SHELL       Command name or path of the shell to use for template
+#   -o <file>      Output file or "-" for STDOUT. Defaults to "-".
+#   -s <shell>     Command name or path of the shell to use for template
 #                  evaluation. It must not contain spaces.
 #                  Defaults to "/bin/sh".
 #   -h             Show this help message and exit.
