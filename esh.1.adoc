@@ -65,7 +65,11 @@ ESH::
 
 == EXIT STATUS
 
-*esh* exits with the exit status of _shell_ or awk.
+*esh* exits with the exit status of _shell_ or awk unless some error has encountered before converting the template.
+
+* 0  - Clean exit, no error has encountered.
+* 1  - Generic error.
+* 10 - Invalid usage.
 
 
 == TEMPLATE SYNTAX

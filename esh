@@ -25,6 +25,11 @@
 #              It must not contain spaces. Defaults to "awk".
 #   ESH_SHELL  Same as -s.
 #
+# EXIT STATUS:
+#    0         Clean exit, no error has encountered.
+#    1         Generic error.
+#   10         Invalid usage.
+#
 # Please report bugs at <https://github.com/jirutka/esh/issues>.
 #---help---
 set -eu
