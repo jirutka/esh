@@ -1,18 +1,18 @@
 #!/bin/sh
 # vim: set ts=4:
 #---help---
-# Usage:
+# USAGE:
 #   esh [options] [--] INPUT [VARIABLE ...]
 #   esh <-h | -V>
 #
 # Process and evaluate an ESH template.
 #
-# Arguments:
+# ARGUMENTS:
 #   INPUT      Path of the template file or "-" to read from STDIN.
 #   VARIABLE   Variable(s) specified as NAME=VALUE to pass into the template
 #              (the have higher priority than environment variables).
 #
-# Options:
+# OPTIONS:
 #   -d         Don't evaluate template, just dump a shell script.
 #   -o FILE    Output file or "-" for STDOUT. Defaults to "-".
 #   -s SHELL   Command name or path of the shell to use for template
@@ -20,7 +20,7 @@
 #   -h         Show this help message and exit.
 #   -V         Print version and exit.
 #
-# Environment Variables:
+# ENVIRONMENT:
 #   ESH_AWK    Command name of path of the awk program to use.
 #              It must not contain spaces. Defaults to "awk".
 #   ESH_SHELL  Same as -s.
