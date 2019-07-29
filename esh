@@ -40,11 +40,6 @@
 #---help---
 set -eu
 
-# Set pipefail if supported.
-if ( set -o pipefail 2>/dev/null ); then
-    set -o pipefail
-fi
-
 readonly PROGNAME='esh'
 readonly VERSION='0.1.1'
 
@@ -198,9 +193,7 @@ BEGIN {
 	FS = ""
 	depth = 0
 
-	if (SHELL) {
-		print("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
-	}
+	print("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
 	print("set -eu")
 	print("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
 	print("__print() { printf '%s' \"$*\"; }")
@@ -228,23 +221,34 @@ help() {
 	exit ${1:-0}
 }
 
-_awk() {
-	$ESH_AWK \
-		-v MAX_DEPTH="$ESH_MAX_DEPTH" \
-		-v PROGNAME="$PROGNAME" \
-		"$@"
-}
-
 convert() {
 	local input="$1"
 	local vars="$2"
+
+	$ESH_AWK \
+		-v MAX_DEPTH="$ESH_MAX_DEPTH" \
+		-v PROGNAME="$PROGNAME" \
+		-v SHELL="$ESH_SHELL" \
+		-v VARS="$vars" \
+		-- "$AWK_PROGRAM" "$input"
+}
+
+process() {
+	local input="$1"
+	local vars="$2"
 	local evaluate="${3:-yes}"
+	local ret=0
+	local tmpfile
 
 	if [ "$evaluate" = yes ]; then
-		_awk -v VARS="$vars" -- "$AWK_PROGRAM" "$input" | $ESH_SHELL -s
+		tmpfile=$(mktemp)
+		convert "$input" "$vars" > "$tmpfile" || ret=$?
+		test "$ret" -ne 0 || $ESH_SHELL "$tmpfile" || ret=$?
+		rm -f "$tmpfile"
 	else
-		_awk -v VARS="$vars" -v SHELL="$ESH_SHELL" -- "$AWK_PROGRAM" "$input"
+		convert "$input" "$vars" || ret=$?
 	fi
+	return $ret
 }
 
 : ${ESH_AWK:="awk"}
@@ -290,8 +294,8 @@ export ESH="$0"
 if [ "${OUTPUT#-}" ]; then
 	tmpfile="$(mktemp)"
 	trap "rm -f '$tmpfile'" EXIT HUP INT TERM
-	convert "$INPUT" "$vars" "$EVALUATE" > "$tmpfile"
+	process "$INPUT" "$vars" "$EVALUATE" > "$tmpfile"
 	mv "$tmpfile" "$OUTPUT"
 else
-	convert "$INPUT" "$vars" "$EVALUATE"
+	process "$INPUT" "$vars" "$EVALUATE"
 fi
