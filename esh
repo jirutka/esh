@@ -216,9 +216,8 @@ AWK
 )
 readonly AWK_PROGRAM
 
-help() {
+print_help() {
 	sed -En '/^#---help---/,/^#---help---/p' "$0" | sed -E 's/^# ?//; 1d;$d;'
-	exit ${1:-0}
 }
 
 convert() {
@@ -257,19 +256,23 @@ process() {
 EVALUATE='yes'
 OUTPUT=''
 
-while getopts 'dho:s:V' OPT; do
+while getopts ':dho:s:V' OPT; do
 	case "$OPT" in
 		d) EVALUATE=no;;
-		h) help 0;;
+		h) print_help; exit 0;;
 		o) OUTPUT="$OPTARG";;
 		s) ESH_SHELL="$OPTARG";;
 		V) echo "$PROGNAME $VERSION"; exit 0;;
-		'?') help 10 >&2;;
+		'?') echo "$PROGNAME: unknown option: -$OPTARG" >&2; exit 10;;
 	esac
 done
 shift $(( OPTIND - 1 ))
 
-[ $# -ge 1 ] || help 1 >&2
+if [ $# -eq 0 ]; then
+	printf "$PROGNAME: %s\n\n" 'missing argument <input>' >&2
+	print_help >&2
+	exit 10
+fi
 
 INPUT="$1"; shift
 [ "$INPUT" != '-' ] || INPUT=''
