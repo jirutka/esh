@@ -1,0 +1,2 @@
+This is file incl/a.esh.
+Variable var1=<%= $var1 %>

@@ -1,0 +1,2 @@
+esh: syntax error: <%+ must be closed on the same line
+%exit-status: 11

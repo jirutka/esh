@@ -1,0 +1,6 @@
+This is file incl/b.esh.
+
+Content from the file a.esh follows:
+<%+ a.esh %>
+
+End of file incl/b.esh.

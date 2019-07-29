@@ -8,27 +8,33 @@
 # Process and evaluate an ESH template.
 #
 # ARGUMENTS:
-#   INPUT      Path of the template file or "-" to read from STDIN.
-#   VARIABLE   Variable(s) specified as NAME=VALUE to pass into the template
-#              (the have higher priority than environment variables).
+#   INPUT          Path of the template file or "-" to read from STDIN.
+#   VARIABLE       Variable(s) specified as NAME=VALUE to pass into the
+#                  template (the have higher priority than environment
+#                  variables).
 #
 # OPTIONS:
-#   -d         Don't evaluate template, just dump a shell script.
-#   -o FILE    Output file or "-" for STDOUT. Defaults to "-".
-#   -s SHELL   Command name or path of the shell to use for template
-#              evaluation. It must not contain spaces. Defaults to "/bin/sh".
-#   -h         Show this help message and exit.
-#   -V         Print version and exit.
+#   -d             Don't evaluate template, just dump a shell script.
+#   -o FILE        Output file or "-" for STDOUT. Defaults to "-".
+#   -s SHELL       Command name or path of the shell to use for template
+#                  evaluation. It must not contain spaces.
+#                  Defaults to "/bin/sh".
+#   -h             Show this help message and exit.
+#   -V             Print version and exit.
 #
 # ENVIRONMENT:
-#   ESH_AWK    Command name of path of the awk program to use.
-#              It must not contain spaces. Defaults to "awk".
-#   ESH_SHELL  Same as -s.
+#   ESH_AWK        Command name of path of the awk program to use.
+#                  It must not contain spaces. Defaults to "awk".
+#   ESH_MAX_DEPTH  Maximum include depth. Defaults to 3.
+#   ESH_SHELL      Same as -s.
 #
 # EXIT STATUS:
-#    0         Clean exit, no error has encountered.
-#    1         Generic error.
-#   10         Invalid usage.
+#    0             Clean exit, no error has encountered.
+#    1             Generic error.
+#   10             Invalid usage.
+#   11             ESH syntax error.
+#   12             Include error: file not found.
+#   13             Include error: exceeded max include depth (ESH_MAX_DEPTH).
 #
 # Please report bugs at <https://github.com/jirutka/esh/issues>.
 #---help---
@@ -43,8 +49,17 @@ readonly PROGNAME='esh'
 readonly VERSION='0.1.1'
 
 AWK_PROGRAM=$(cat <<'AWK'
+function die(code, msg) {
+	state = "ERROR"
+	printf(PROGNAME ": %s\n", msg) > "/dev/stderr"  # FIXME: /dev/stderr is not portable
+	exit code
+}
 function fputs(str) {
 	printf("%s", str)
+}
+function trim(str) {
+	gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "", str)
+	return str
 }
 function read(len,  _str) {
 	if (len == "") {
@@ -69,23 +84,61 @@ function flush(len,  _str) {
 		fputs(_str)
 	}
 }
-BEGIN {
-	FS = ""
-	buff = ""
-
-	if (SHELL) {
-		print("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
+function file_exists(filename,  _junk) {
+	if ((getline _junk < filename) >= 0) {
+		close(filename)
+		return 1
 	}
-	print("set -eu")
-	print("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
-	print("__print() { printf '%s' \"$*\"; }")
-	print(VARS)
-
-	fputs("\nprintf '%s' '")
-	state = "TEXT"
+	return 0
 }
-{
-	buff = $0
+function dirname(path) {
+	return sub(/\/[^\/]+\/*$/, "", path) ? path : "."
+}
+function include(filename,  _filepath) {
+	if (depth == 0) {
+		filepaths[0] = FILENAME  # this var is not defined in BEGIN so we must do it here
+	}
+	_filepath = filepaths[depth]
+	if (index(filename, "/") != 1) {  # if does not start with "/"
+		filename = dirname(_filepath) "/" filename
+	}
+	if (!file_exists(filename)) {
+		die(12, _filepath ": cannot include " filename ": file does not exist or not readable")
+	}
+	if (depth > MAX_DEPTH) {
+		die(13, _filepath ": cannot include " filename ": exceeded maximum depth of " MAX_DEPTH)
+	}
+	buffs[depth] = buff
+	states[depth] = state
+	filepaths[depth + 1] = filename
+	depth++
+
+	init()
+	while ((getline buff < filename) > 0) {
+		if (print_nl && state != "COMMENT") {
+			fputs("\n")
+		}
+		process_line()
+	}
+	finalize()
+	close(filename)
+
+	depth--
+	buff = buffs[depth]
+	state = states[depth]
+}
+function init() {
+	buff = ""
+	state = "TEXT"
+	print_nl = 0
+	fputs("\nprintf '%s' '")
+}
+function finalize() {
+	if (state == "TEXT") {
+		fputs("'\n")
+	}
+}
+function process_line() {
 	while (buff != "") {
 		print_nl = 1
 
@@ -103,6 +156,14 @@ BEGIN {
 			} else if (flag == "=") {  # <%=
 				skip(1)
 				fputs("__print ")
+				state = "TAG"
+			} else if (flag == "+") {  # <%+
+				if (!match(buff, /[^%]%>/)) {
+					die(11, "syntax error: <%+ must be closed on the same line")
+				}
+				filename = trim(substr(buff, 2, match(buff, /.-?%>/) - 1))
+				skip(RSTART)
+				include(filename)
 				state = "TAG"
 			} else if (flag == "#") {  # <%#
 				state = "COMMENT"
@@ -132,14 +193,31 @@ BEGIN {
 			flush()
 		}
 	}
+}
+BEGIN {
+	FS = ""
+	depth = 0
+
+	if (SHELL) {
+		print("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
+	}
+	print("set -eu")
+	print("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
+	print("__print() { printf '%s' \"$*\"; }")
+	print(VARS)
+
+	init()
+}
+{
+	buff = $0
+	process_line()
+
 	if (print_nl && state != "COMMENT") {
 		fputs("\n")
 	}
 }
 END {
-	if (state == "TEXT") {
-		fputs("'\n")
-	}
+	finalize()
 }
 AWK
 )
@@ -150,19 +228,27 @@ help() {
 	exit ${1:-0}
 }
 
+_awk() {
+	$ESH_AWK \
+		-v MAX_DEPTH="$ESH_MAX_DEPTH" \
+		-v PROGNAME="$PROGNAME" \
+		"$@"
+}
+
 convert() {
 	local input="$1"
 	local vars="$2"
 	local evaluate="${3:-yes}"
 
 	if [ "$evaluate" = yes ]; then
-		$ESH_AWK -v VARS="$vars" -- "$AWK_PROGRAM" "$input" | $ESH_SHELL -s
+		_awk -v VARS="$vars" -- "$AWK_PROGRAM" "$input" | $ESH_SHELL -s
 	else
-		$ESH_AWK -v VARS="$vars" -v SHELL="$ESH_SHELL" -- "$AWK_PROGRAM" "$input"
+		_awk -v VARS="$vars" -v SHELL="$ESH_SHELL" -- "$AWK_PROGRAM" "$input"
 	fi
 }
 
 : ${ESH_AWK:="awk"}
+: ${ESH_MAX_DEPTH:=3}
 : ${ESH_SHELL:="/bin/sh"}
 EVALUATE='yes'
 OUTPUT=''

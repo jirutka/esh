@@ -10,9 +10,10 @@ image:https://travis-ci.org/{gh-name}.svg?branch=master["Build Status", link="ht
 endif::env-github[]
 
 *esh* (embedded shell) is a templating engine for evaluating shell commands embedded in arbitrary templates.
-It's like ERB (Embedded RuBy) for shell, intended to be used for templating configuration files.
+It’s like ERB (Embedded RuBy) for shell, intended to be used for templating configuration files.
+Unlike ERB it provides support for including one ESH template into another (since version 0.2.0).
 
-esh is implemented in ~160 lines (LoC) of shell and awk.
+esh is implemented in ~231 lines (LoC) of shell and awk.
 
 
 == Requirements
@@ -97,6 +98,8 @@ http {
     <% if nginx -V 2>&1 | grep -q lua-nginx-module; then -%>
     lua_package_path '<%= $(pkg-config --variable=INSTALL_LMOD lua) %>/?.lua';
     <% fi -%>
+
+    <%+ ./http-common.esh %>
 
     <%# The rest of the config is omitted %>
 }

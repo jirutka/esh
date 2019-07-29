@@ -18,6 +18,7 @@ esh - simple template system based on shell
 
 *esh* (embedded shell) is a templating engine for evaluating shell commands embedded in arbitrary templates.
 It's like ERB (Embedded RuBy) for shell, intended to be used for templating configuration files.
+Unlike ERB it provides support for including one ESH template into another (since version 0.2.0).
 
 *esh* converts template _file_, or _stdin_ if _file_ is "`-`", into a sequence of shell commands.
 Commands between _<%_ and _%>_ tags are passed as-is, everything else is escaped and prefixed with *printf* command.
@@ -54,6 +55,10 @@ These commands are eventually evaluated using _shell_ (unless *-d* is specified)
   It must not contain spaces.
   Defaults to "`awk`".
 
+*ESH_MAX_DEPTH*::
+  Maximum include depth.
+  Defaults to 3.
+
 *ESH_SHELL*::
   The same as *-s* _shell_.
 
@@ -70,11 +75,14 @@ The following extra environment variables are available inside the template and 
 * *0*  - Clean exit, no error has encountered.
 * *1*  - Generic error.
 * *10* - Invalid usage.
+* *11* - ESH syntax error.
+* *12* - Include error: file not found.
+* *13* - Include error: exceeded max include depth (*ESH_MAX_DEPTH*).
 
 
 == TEMPLATE SYNTAX
 
-ESH has two tags for shell code, a tag for comments, and a way to escape tag delimiters.
+ESH has two tags for shell code, a tag for include, comments, and a way to escape tag delimiters.
 
 <% commands %>::
   Executes the _commands_ and replaces this tag with its output on _stdout_.
@@ -82,6 +90,16 @@ ESH has two tags for shell code, a tag for comments, and a way to escape tag del
 <%= values %>::
   Executes _printf '%s '_ with the _values_ as arguments and replaces this tag with the output (without trailing white space).
   _values_ are not quoted or escaped, so all shell substitutions are applied.
+
+<%+ filename %>::
+Reads and converts ESH template from the _filename_ and puts it in place of this tag.
+Includes are processed recursively, but the depth is limited by *ESH_MAX_DEPTH*.
++
+If the _filename_ is relative, it's resolved against the directory of the template file in which this tag resides.
+If the template is read from _stdin_, the first level includes are resolved against the current working directory.
+Please note that includes are processed during the conversion, not the evaluation phase, so the _filename_ cannot be an expression or a variable!
++
+Unlike the others, this tag must be closed on the same line, otherwise it's a syntax error.
 
 <%# comment %>::
   Removed from the final output.
@@ -115,6 +133,8 @@ http {
     <% if nginx -V 2>&1 | grep -q lua-nginx-module; then -%>
     lua_package_path '<%= $(pkg-config --variable=INSTALL_LMOD lua) %>/?.lua';
     <% fi -%>
+
+    <%+ ./http-common.esh %>
 
     <%# The rest of the config is omitted %>
 }

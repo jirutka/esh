@@ -1,0 +1,3 @@
+<% var1=42 -%>
+Content from the file incl/a.esh: <%+ incl/a.esh %>.
+The main file continues.

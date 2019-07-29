@@ -1,0 +1,2 @@
+esh: ./test-include-max-depth.in: cannot include ./test-include-max-depth.in: exceeded maximum depth of 3
+%exit-status: 13

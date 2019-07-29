@@ -1,0 +1,7 @@
+Content from the file incl/b.esh: This is file incl/b.esh.
+
+Content from the file a.esh follows:
+This is file incl/a.esh.
+Variable var1=42
+
+End of file incl/b.esh. The main file continues.
