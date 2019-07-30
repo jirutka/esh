@@ -41,7 +41,7 @@
 set -eu
 
 readonly PROGNAME='esh'
-readonly VERSION='0.1.1'
+readonly VERSION='0.2.0'
 
 AWK_PROGRAM=$(cat <<'AWK'
 function die(code, msg) {

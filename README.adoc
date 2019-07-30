@@ -1,9 +1,9 @@
 = ESH – Embedded SHell
 :source-language: sh
 :script-name: esh
-:script-sha1: 2a992f8b74cb47f8b0e36dfb4c16061d3042bfaa
+:script-sha1: f0074522d43bf1c06bf2c9b26092f754b7c4fa19
 :gh-name: jirutka/{script-name}
-:version: 0.1.1
+:version: 0.2.0
 
 ifdef::env-github[]
 image:https://travis-ci.org/{gh-name}.svg?branch=master["Build Status", link="https://travis-ci.org/{gh-name}"]
