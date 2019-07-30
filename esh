@@ -44,7 +44,7 @@ readonly PROGNAME='esh'
 readonly VERSION='0.2.0'
 
 AWK_PROGRAM=$(cat <<'AWK'
-function die(code, msg) {
+function fail(code, msg) {
 	state = "ERROR"
 	printf(PROGNAME ": %s\n", msg) > "/dev/stderr"  # FIXME: /dev/stderr is not portable
 	exit code
@@ -98,10 +98,10 @@ function include(filename,  _filepath) {
 		filename = dirname(_filepath) "/" filename
 	}
 	if (!file_exists(filename)) {
-		die(12, _filepath ": cannot include " filename ": file does not exist or not readable")
+		fail(12, _filepath ": cannot include " filename ": file does not exist or not readable")
 	}
 	if (depth > MAX_DEPTH) {
-		die(13, _filepath ": cannot include " filename ": exceeded maximum depth of " MAX_DEPTH)
+		fail(13, _filepath ": cannot include " filename ": exceeded maximum depth of " MAX_DEPTH)
 	}
 	buffs[depth] = buff
 	states[depth] = state
@@ -154,7 +154,7 @@ function process_line() {
 				state = "TAG"
 			} else if (flag == "+") {  # <%+
 				if (!match(buff, /[^%]%>/)) {
-					die(11, "syntax error: <%+ must be closed on the same line")
+					fail(11, "syntax error: <%+ must be closed on the same line")
 				}
 				filename = trim(substr(buff, 2, match(buff, /.-?%>/) - 1))
 				skip(RSTART)
