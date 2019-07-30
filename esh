@@ -47,7 +47,7 @@ AWK_PROGRAM=$(cat <<'AWK'
 function fail(code, msg) {
 	state = "ERROR"
 	# FIXME: /dev/stderr is not portable
-	printf(PROGNAME ": %s: %s\n", filenames[depth], msg) > "/dev/stderr"
+	printf("%s: %s\n", filenames[depth], msg) > "/dev/stderr"
 	exit code
 }
 function fputs(str) {
@@ -226,7 +226,6 @@ convert() {
 
 	$ESH_AWK \
 		-v MAX_DEPTH="$ESH_MAX_DEPTH" \
-		-v PROGNAME="$PROGNAME" \
 		-v SHELL="$ESH_SHELL" \
 		-v VARS="$vars" \
 		-- "$AWK_PROGRAM" "$input"
