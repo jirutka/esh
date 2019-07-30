@@ -123,8 +123,11 @@ function init() {
 	buff = ""
 	linenos[depth] = 0
 	print_nl = 0
-	state = "TEXT"
+	start_text()
+}
+function start_text() {
 	fputs("\nprintf '%s' '")
+	state = "TEXT"
 }
 function end_text() {
 	if (state != "TEXT") { return }
@@ -181,8 +184,7 @@ function process_line() {
 				skip(2)
 			}
 			if (flag != "%") {
-				fputs("\nprintf '%s' '")
-				state = "TEXT"
+				start_text()
 			}
 		} else {
 			flush()
