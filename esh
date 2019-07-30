@@ -46,7 +46,8 @@ readonly VERSION='0.2.0'
 AWK_PROGRAM=$(cat <<'AWK'
 function fail(code, msg) {
 	state = "ERROR"
-	printf(PROGNAME ": %s\n", msg) > "/dev/stderr"  # FIXME: /dev/stderr is not portable
+	# FIXME: /dev/stderr is not portable
+	printf(PROGNAME ": %s: %s\n", filenames[depth], msg) > "/dev/stderr"
 	exit code
 }
 function fputs(str) {
@@ -89,23 +90,19 @@ function file_exists(filename,  _junk) {
 function dirname(path) {
 	return sub(/\/[^\/]+\/*$/, "", path) ? path : "."
 }
-function include(filename,  _filepath) {
-	if (depth == 0) {
-		filepaths[0] = FILENAME  # this var is not defined in BEGIN so we must do it here
-	}
-	_filepath = filepaths[depth]
+function include(filename) {
 	if (index(filename, "/") != 1) {  # if does not start with "/"
-		filename = dirname(_filepath) "/" filename
+		filename = dirname(filenames[depth]) "/" filename
 	}
 	if (!file_exists(filename)) {
-		fail(12, _filepath ": cannot include " filename ": file does not exist or not readable")
+		fail(12, "cannot include " filename ": file does not exist or not readable")
 	}
 	if (depth > MAX_DEPTH) {
-		fail(13, _filepath ": cannot include " filename ": exceeded maximum depth of " MAX_DEPTH)
+		fail(13, "cannot include " filename ": exceeded maximum depth of " MAX_DEPTH)
 	}
 	buffs[depth] = buff
 	states[depth] = state
-	filepaths[depth + 1] = filename
+	filenames[depth + 1] = filename
 	depth++
 
 	init()
@@ -202,6 +199,9 @@ BEGIN {
 	init()
 }
 {
+	if (NR == 1) {
+		filenames[0] = FILENAME  # this var is not defined in BEGIN so we must do it here
+	}
 	buff = $0
 	process_line()
 

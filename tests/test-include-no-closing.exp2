@@ -1,2 +1,2 @@
-esh: syntax error: <%+ must be closed on the same line
+esh: test-include-no-closing.in: syntax error: <%+ must be closed on the same line
 %exit-status: 11
