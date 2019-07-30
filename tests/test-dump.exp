@@ -15,4 +15,4 @@ printf '%s' '!
 printf '%s' 'This is an ESH template.
 '  #< test-dump.in:6
  fi 
-printf '%s' ''
+printf '%s' ''  #< test-dump.in:6
