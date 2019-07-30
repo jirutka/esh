@@ -95,7 +95,7 @@ function include(filename) {
 		filename = dirname(filenames[depth]) "/" filename
 	}
 	if (!file_exists(filename)) {
-		fail(12, "cannot include " filename ": file does not exist or not readable")
+		fail(12, "cannot include " filename ": not a file or not readable")
 	}
 	if (depth > MAX_DEPTH) {
 		fail(13, "cannot include " filename ": exceeded maximum depth of " MAX_DEPTH)
