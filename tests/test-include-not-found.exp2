@@ -1,2 +1,2 @@
-test-include-not-found.in: cannot include ./non-existing.esh: file does not exist or not readable
+test-include-not-found.in:2: cannot include ./non-existing.esh: file does not exist or not readable
 %exit-status: 12

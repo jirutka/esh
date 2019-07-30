@@ -1,0 +1,6 @@
+<% var1=42 -%>
+Content from the file incl/b.esh:
+<%+ incl/b.esh %>
+The main file continues.
+
+Now try to include file with invalid include: <%+ incl/invalid.esh %>

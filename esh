@@ -47,7 +47,7 @@ AWK_PROGRAM=$(cat <<'AWK'
 function fail(code, msg) {
 	state = "ERROR"
 	# FIXME: /dev/stderr is not portable
-	printf("%s: %s\n", filenames[depth], msg) > "/dev/stderr"
+	printf("%s:%d: %s\n", filenames[depth], linenos[depth], msg) > "/dev/stderr"
 	exit code
 }
 function fputs(str) {
@@ -121,8 +121,9 @@ function include(filename) {
 }
 function init() {
 	buff = ""
-	state = "TEXT"
+	linenos[depth] = 0
 	print_nl = 0
+	state = "TEXT"
 	fputs("\nprintf '%s' '")
 }
 function finalize() {
@@ -131,6 +132,8 @@ function finalize() {
 	}
 }
 function process_line() {
+	linenos[depth]++
+
 	while (buff != "") {
 		print_nl = 1
 

@@ -1,0 +1,6 @@
+This is file incl/c.esh.
+
+Try to include non-existing file x.esh:
+<%+ x.esh %>
+
+End of file incl/c.esh.
