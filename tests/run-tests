@@ -22,7 +22,7 @@ for name in $(ls -1 test-* | sed 's/\.[a-z0-9]*$//' | uniq); do
 	test_script="$name.t"
 	[ -e "$test_script" ] || test_script='diff-test'
 
-	printf %-26s "$name" | tr ' ' '.'
+	printf %-32s "$name" | tr ' ' '.'
 
 	rm -f "$name.err"
 	if TEST_NAME="$name" ./"$test_script" > "$name.err" 2> "$name.err2"; then
