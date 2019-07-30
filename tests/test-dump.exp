@@ -3,7 +3,6 @@ set -eu
 if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi
 __print() { printf '%s' "$*"; }
 
-
 printf '%s' ''  #< test-dump.in:1
 
 printf '%s' 'Hello from '  #< test-dump.in:2

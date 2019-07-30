@@ -43,12 +43,20 @@ set -eu
 readonly PROGNAME='esh'
 readonly VERSION='0.2.0'
 
-AWK_PROGRAM=$(cat <<'AWK'
+AWK_CONVERTER=$(cat <<'AWK'
 function fail(code, msg) {
 	state = "ERROR"
 	# FIXME: /dev/stderr is not portable
-	printf("%s:%d: %s\n", filenames[depth], linenos[depth], msg) > "/dev/stderr"
+	printf("%s: %s\n", line_info(), msg) > "/dev/stderr"
 	exit code
+}
+function line_info() {
+	return FILENAME ? (filenames[depth] ":" linenos[depth]) : "(init)"  # (init) if inside BEGIN
+}
+# IMPORTANT: This is the only function that should print a newline.
+function puts(str) {
+	print(line_info()) > MAP_FILE
+	print(str)
 }
 function fputs(str) {
 	printf("%s", str)
@@ -108,7 +116,7 @@ function include(filename) {
 	init()
 	while ((getline buff < filename) > 0) {
 		if (print_nl && state != "COMMENT") {
-			fputs("\n")
+			puts("")
 		}
 		process_line()
 	}
@@ -126,12 +134,13 @@ function init() {
 	start_text()
 }
 function start_text() {
-	fputs("\nprintf '%s' '")
+	puts("")
+	fputs("printf '%s' '")
 	state = "TEXT"
 }
 function end_text() {
 	if (state != "TEXT") { return }
-	fputs(sprintf("'  #< %s:%d\n", filenames[depth], linenos[depth]))
+	puts("'  #< " line_info())
 	state = "UNDEF"
 }
 function process_line() {
@@ -195,12 +204,15 @@ BEGIN {
 	FS = ""
 	depth = 0
 
-	print("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
-	print("set -eu")
-	print("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
-	print("__print() { printf '%s' \"$*\"; }")
-	print(VARS)
+	puts("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
+	puts("set -eu")
+	puts("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
+	puts("__print() { printf '%s' \"$*\"; }")
 
+	split(VARS, _lines, /\n/)
+	for (_i in _lines) {
+		puts(_lines[_i])
+	}
 	init()
 }
 {
@@ -211,7 +223,7 @@ BEGIN {
 	process_line()
 
 	if (print_nl && state != "COMMENT") {
-		fputs("\n")
+		puts("")
 	}
 }
 END {
@@ -219,35 +231,77 @@ END {
 }
 AWK
 )
-readonly AWK_PROGRAM
+AWK_ERR_FILTER=$(cat <<'AWK'
+function line_info(lno,  _line, _i) {
+	while ((getline _line < MAPFILE) > 0 && _i++ < lno) { }
+	close(MAPFILE)
+	return _line
+}
+{
+	if (match($0, "^" SRCFILE ":( line)? ?[0-9]+:") && match(substr($0, 1, RLENGTH), /[0-9]+:$/)) {
+		lno = substr($0, RSTART, RLENGTH - 1) + 0
+		msg = substr($0, RSTART + RLENGTH + 1)  # v-- some shells duplicate filename
+		msg = index(msg, SRCFILE ":") == 1 ? substr(msg, length(SRCFILE) + 3) : msg
+		print(line_info(lno) ": " msg)
+	} else if ($0 != "") {
+		print($0)
+	}
+}
+AWK
+)
+readonly AWK_CONVERTER AWK_ERR_FILTER
 
 print_help() {
 	sed -En '/^#---help---/,/^#---help---/p' "$0" | sed -E 's/^# ?//; 1d;$d;'
 }
 
+filter_shell_stderr() {
+	$ESH_AWK \
+		-v SRCFILE="$1" \
+		-v MAPFILE="$2" \
+		-- "$AWK_ERR_FILTER"
+}
+
+evaluate() {
+	local srcfile="$1"
+	local mapfile="$2"
+
+	# This FD redirection magic is for swapping stdout/stderr back and forth.
+	exec 3>&1
+	{ set +e; $ESH_SHELL "$srcfile" 2>&1 1>&3; echo $? >>"$mapfile"; } \
+		| filter_shell_stderr "$srcfile" "$mapfile" >&2
+	exec 3>&-
+
+	return $(tail -n 1 "$mapfile")
+}
+
 convert() {
 	local input="$1"
 	local vars="$2"
+	local map_file="${3:-"/dev/null"}"
 
 	$ESH_AWK \
 		-v MAX_DEPTH="$ESH_MAX_DEPTH" \
 		-v SHELL="$ESH_SHELL" \
+		-v MAP_FILE="$map_file" \
 		-v VARS="$vars" \
-		-- "$AWK_PROGRAM" "$input"
+		-- "$AWK_CONVERTER" "$input"
 }
 
 process() {
 	local input="$1"
 	local vars="$2"
 	local evaluate="${3:-yes}"
-	local ret=0
-	local tmpfile
+	local ret=0 tmpfile mapfile
 
 	if [ "$evaluate" = yes ]; then
 		tmpfile=$(mktemp)
-		convert "$input" "$vars" > "$tmpfile" || ret=$?
-		test "$ret" -ne 0 || $ESH_SHELL "$tmpfile" || ret=$?
-		rm -f "$tmpfile"
+		mapfile=$(mktemp)
+
+		convert "$input" "$vars" "$mapfile" > "$tmpfile" || ret=$?
+		test $ret -ne 0 || evaluate "$tmpfile" "$mapfile" || ret=$?
+
+		rm -f "$tmpfile" "$mapfile"
 	else
 		convert "$input" "$vars" || ret=$?
 	fi

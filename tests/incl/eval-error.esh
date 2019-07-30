@@ -1,0 +1,3 @@
+This is file incl/eval-error.esh.
+
+Let's try a non-existing command: <% does-not-exist-666 %>.

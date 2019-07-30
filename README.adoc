@@ -13,7 +13,7 @@ endif::env-github[]
 It’s like ERB (Embedded RuBy) for shell, intended to be used for templating configuration files.
 Unlike ERB it provides support for including one ESH template into another (since version 0.2.0).
 
-esh is implemented in ~240 lines (LoC) of shell and awk.
+esh is implemented in ~290 lines (LoC) of shell and awk.
 
 
 == Requirements

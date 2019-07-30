@@ -1,0 +1,7 @@
+<% var1=42 -%>
+Content from the file incl/b.esh:
+<%+ incl/b.esh %>
+The main file continues.
+
+Now try to include file with an invalid shell command:
+<%+ incl/eval-error.esh %>

@@ -1,0 +1,6 @@
+<% if true; then %>Lorem ipsum dolor sit amet,<% fi %>
+consectetur <% printf "adipiscing elit." %>
+
+Let's try an undefined variable: <%= $undefined_var %>.
+
+End of file.
