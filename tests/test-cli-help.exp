@@ -1,0 +1,36 @@
+USAGE:
+  esh [options] [--] <input> [<variable>...]
+  esh <-h | -V>
+
+Process and evaluate an ESH template.
+
+ARGUMENTS:
+  <input>        Path of the template file or "-" to read from STDIN.
+  <variable>     Variable(s) specified as <name>=<value> to pass into the
+                 template (the have higher priority than environment
+                 variables).
+
+OPTIONS:
+  -d             Don't evaluate template, just dump a shell script.
+  -o <file>      Output file or "-" for STDOUT. Defaults to "-".
+  -s <shell>     Command name or path of the shell to use for template
+                 evaluation. It must not contain spaces.
+                 Defaults to "/bin/sh".
+  -h             Show this help message and exit.
+  -V             Print version and exit.
+
+ENVIRONMENT:
+  ESH_AWK        Command name of path of the awk program to use.
+                 It must not contain spaces. Defaults to "awk".
+  ESH_MAX_DEPTH  Maximum include depth. Defaults to 3.
+  ESH_SHELL      Same as -s.
+
+EXIT STATUS:
+   0             Clean exit, no error has encountered.
+   1             Generic error.
+  10             Invalid usage.
+  11             ESH syntax error.
+  12             Include error: file not found.
+  13             Include error: exceeded max include depth (ESH_MAX_DEPTH).
+
+Please report bugs at <https://github.com/jirutka/esh/issues>.

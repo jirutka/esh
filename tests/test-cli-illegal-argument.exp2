@@ -1,0 +1,2 @@
+esh: illegal argument: foo
+%exit-status: 10

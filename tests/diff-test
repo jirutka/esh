@@ -7,6 +7,7 @@ _diff() {
 }
 
 : ${TEST_NAME:=${1:-}}
+: ${TEST_COMMAND:="${ESH:-esh} $TEST_NAME.in"}
 
 if [ -z "$TEST_NAME" ]; then
 	echo "Usage: $0 TEST_NAME" >&2; exit 1
@@ -18,7 +19,7 @@ fi
 status=0
 esh_status=0
 
-${ESH:-esh} "$TEST_NAME.in" > "$TEST_NAME.err" 2> "$TEST_NAME.err2" || esh_status=$?
+$TEST_COMMAND > "$TEST_NAME.err" 2> "$TEST_NAME.err2" || esh_status=$?
 
 if [ -f "$TEST_NAME.exp" ]; then
 	_diff "$TEST_NAME.exp" "$TEST_NAME.err" || status=$?

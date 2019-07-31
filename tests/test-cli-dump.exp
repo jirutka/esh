@@ -3,15 +3,15 @@ set -eu
 if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi
 __print() { printf '%s' "$*"; }
 
-printf '%s' ''  #< test-dump.in:1
+printf '%s' ''  #< test-cli-dump.in:1
 
-printf '%s' 'Hello from '  #< test-dump.in:2
+printf '%s' 'Hello from '  #< test-cli-dump.in:2
 __print  $TEST_NAME 
 printf '%s' '!
 
-'  #< test-dump.in:4
+'  #< test-cli-dump.in:4
  if [ 1 = 1 ]; then 
 printf '%s' 'This is an ESH template.
-'  #< test-dump.in:6
+'  #< test-cli-dump.in:6
  fi 
-printf '%s' ''  #< test-dump.in:6
+printf '%s' ''  #< test-cli-dump.in:6
