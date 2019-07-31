@@ -3,6 +3,7 @@ language: minimal
 addons:
   apt:
     packages:
+      - freebsd-glue
       - original-awk
       - zsh
 env:
@@ -12,5 +13,6 @@ env:
     - ESH_SHELL="/bin/bash"
     - ESH_SHELL="/bin/zsh5"
     - ESH_AWK="/usr/bin/original-awk"
+    - ESH_AWK="/usr/lib/freebsd/awk"
 script:
   - ESH="$ESH_SHELL $(pwd)/esh" make test
