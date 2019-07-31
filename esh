@@ -42,6 +42,7 @@ set -eu
 
 readonly PROGNAME='esh'
 readonly VERSION='0.2.0'
+readonly SCRIPTPATH="$0"
 
 AWK_CONVERTER=$(cat <<'AWK'
 function fail(code, msg) {
@@ -252,7 +253,7 @@ AWK
 readonly AWK_CONVERTER AWK_ERR_FILTER
 
 print_help() {
-	sed -En '/^#---help---/,/^#---help---/p' "$0" | sed -E 's/^# ?//; 1d;$d;'
+	sed -En '/^#---help---/,/^#---help---/p' "$SCRIPTPATH" | sed -E 's/^# ?//; 1d;$d;'
 }
 
 filter_shell_stderr() {
