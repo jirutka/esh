@@ -13,6 +13,10 @@ endif::env-github[]
 It’s like ERB (Embedded RuBy) for shell, intended to be used for templating configuration files.
 Unlike ERB it provides support for including one ESH template into another (since version 0.2.0).
 
+The template processing consists of two phases: conversion to a shell script and evaluation of that script.
+You can even run just the conversion phase: `esh -d` will dump a shell script that you can execute directly by a shell (even on a system without `esh` installed).
+However, in that case, you will not get error messages source-mapped to point to the locations in the template file.
+
 esh is implemented in ~290 lines (LoC) of shell and awk.
 
 
