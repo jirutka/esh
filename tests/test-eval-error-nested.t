@@ -14,7 +14,7 @@ msg=$(cmd 2>&1 | rev | cut -d: -f1-2 | rev)
 cmd >/dev/null 2>&1 || status=$?
 
 cat > $TEST_NAME.exp2 <<EOF
-./incl/eval-error.esh:3: ${msg# *}
+incl/eval-error.esh:3: ${msg# *}
 %exit-status: $status
 EOF
 trap "rm '$TEST_NAME.exp2'" EXIT HUP INT TERM

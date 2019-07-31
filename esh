@@ -97,11 +97,11 @@ function file_exists(filename,  _junk) {
 	return 0
 }
 function dirname(path) {
-	return sub(/\/[^\/]+\/*$/, "", path) ? path : "."
+	return sub(/\/[^\/]+\/*$/, "/", path) ? path : ""
 }
 function include(filename) {
 	if (index(filename, "/") != 1) {  # if does not start with "/"
-		filename = dirname(filenames[depth]) "/" filename
+		filename = dirname(filenames[depth]) filename
 	}
 	if (!file_exists(filename)) {
 		fail(12, "cannot include " filename ": not a file or not readable")

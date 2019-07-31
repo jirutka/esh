@@ -1,2 +1,2 @@
-./incl/invalid.esh:4: cannot include ./incl/x.esh: not a file or not readable
+incl/invalid.esh:4: cannot include incl/x.esh: not a file or not readable
 %exit-status: 12
