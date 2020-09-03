@@ -206,7 +206,7 @@ BEGIN {
 	depth = 0
 
 	puts("#!" (SHELL ~ /\// ? SHELL : "/usr/bin/env " SHELL))
-	puts("set -eu")
+	puts("set -e")
 	puts("if ( set -o pipefail 2>/dev/null ); then set -o pipefail; fi")
 	puts("__print() { printf '%s' \"$*\"; }")
 
