@@ -145,6 +145,7 @@ function end_text() {
 	state = "UNDEF"
 }
 function process_line() {
+	print_nl = 1
 	linenos[depth]++
 
 	while (buff != "") {
