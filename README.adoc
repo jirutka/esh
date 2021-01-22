@@ -6,7 +6,7 @@
 :version: 0.3.0
 
 ifdef::env-github[]
-image:https://travis-ci.org/{gh-name}.svg?branch=master["Build Status", link="https://travis-ci.org/{gh-name}"]
+image:https://github.com/{gh-name}/workflows/CI/badge.svg[Build Status, link=https://github.com/{gh-name}/actions?query=workflow%3A%22CI%22]
 endif::env-github[]
 
 *esh* (embedded shell) is a templating engine for evaluating shell commands embedded in arbitrary templates.

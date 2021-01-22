@@ -1,0 +1,24 @@
+name: CI
+on:
+  - push
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - shell: /bin/busybox ash
+            awk: /bin/busybox awk
+          - shell: /bin/dash
+          - shell: /bin/bash
+          - shell: /bin/zsh
+          - awk: /usr/bin/original-awk
+          - awk: /usr/lib/freebsd/awk
+    env:
+      ESH_SHELL: ${{ matrix.shell }}
+      ESH_AWK: ${{ matrix.awk }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install freebsd-glue original-awk zsh
+      - run: ESH="$ESH_SHELL $(pwd)/esh" make test
