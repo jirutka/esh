@@ -13,7 +13,7 @@ hr() {
 
 cd "$(dirname "$0")"
 
-export PATH="$(pwd)/..:$PATH"
+export ESH="${ESH_SHELL:-/bin/sh} ../esh"
 
 passed=0
 failed=0

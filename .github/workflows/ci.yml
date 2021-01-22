@@ -21,4 +21,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install freebsd-glue original-awk zsh
-      - run: ESH="$ESH_SHELL $(pwd)/esh" make test
+      - run: make test
