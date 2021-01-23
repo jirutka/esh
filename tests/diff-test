@@ -16,20 +16,20 @@ if [ ! -f "$TEST_NAME.exp" ] && [ ! -f "$TEST_NAME.exp2" ]; then
 	echo "Neither $TEST_NAME.exp nor $TEST_NAME.exp2 exists" >&2; exit 1
 fi
 
-status=0
+diff_status=0
 esh_status=0
 
 $TEST_COMMAND > "$TEST_NAME.err" 2> "$TEST_NAME.err2" || esh_status=$?
 
 if [ -f "$TEST_NAME.exp" ]; then
-	_diff "$TEST_NAME.exp" "$TEST_NAME.err" || status=$?
+	_diff "$TEST_NAME.exp" "$TEST_NAME.err" || diff_status=$?
 fi
 if [ -f "$TEST_NAME.exp2" ] || [ "$esh_status" -ne 0 ]; then
 	exp2_file="$TEST_NAME.exp2"
 	test -f "$exp2_file" || exp2_file='no-error.exp2'
 
 	echo "%exit-status: $esh_status" >> "$TEST_NAME.err2"
-	_diff "$exp2_file" "$TEST_NAME.err2" >&2 || status=$?
+	_diff "$exp2_file" "$TEST_NAME.err2" >&2 || diff_status=$?
 fi
 
-exit $status
+exit $diff_status
