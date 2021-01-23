@@ -15,7 +15,7 @@ OPTIONS:
   -o <file>      Output file or "-" for STDOUT. Defaults to "-".
   -s <shell>     Command name or path of the shell to use for template
                  evaluation. It must not contain spaces.
-                 Defaults to "/bin/sh".
+                 Defaults to $SHELL or "/bin/sh".
   -h             Show this help message and exit.
   -V             Print version and exit.
 

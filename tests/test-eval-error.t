@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 
 # Generate expectation file based on the used shell.
 cmd() {
-	${ESH_SHELL:-sh} -c 'set -eu; echo $undefined_var'
+	${ESH_SHELL:-${SHELL:-sh}} -c 'set -eu; echo $undefined_var'
 }
 msg=$(cmd 2>&1 | rev | cut -d: -f1-2 | rev)
 cmd >/dev/null 2>&1 || status=$?

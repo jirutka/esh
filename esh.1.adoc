@@ -37,7 +37,7 @@ These commands are eventually evaluated using _shell_ (unless *-d* is specified)
 *-s* _shell_::
   Command name or path of the shell to use for template evaluation.
   It must not contain spaces.
-  Defaults to "`/bin/sh`".
+  Defaults to `$SHELL` or "`/bin/sh`".
 
 *-h*::
   Show help message and exit.
