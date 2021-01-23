@@ -43,16 +43,6 @@ apk add {script-name}
 dnf install {script-name}
 
 
-=== openSUSE
-
-Install package *{script-name}* from https://build.opensuse.org/project/show/home:jirutka/[my repository] on https://build.opensuse.org[openSUSE Build Service]:
-
-[source, subs="+attributes"]
-zypper addrepo http://download.opensuse.org/repositories/home:jirutka/openSUSE_Leap_15.0/home:jirutka.repo
-zypper refresh
-zypper install {script-name}
-
-
 === On CI
 
 You can add {script-name} as a submodule into your repository or download it on demand, e.g.:
