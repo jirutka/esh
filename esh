@@ -335,8 +335,7 @@ if [ $# -eq 0 ]; then
 fi
 
 INPUT="$1"; shift
-[ "$INPUT" != '-' ] || INPUT=''
-if [ "$INPUT" ] && ! [ -f "$INPUT" -a -r "$INPUT" ]; then
+if [ "$INPUT" != '-' ] && ! [ -f "$INPUT" -a -r "$INPUT" ]; then
 	echo "$PROGNAME: can't read $INPUT: not a file or not readable" >&2; exit 10
 fi
 
