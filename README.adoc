@@ -36,8 +36,6 @@ Install package *{script-name}* from the Alpine’s community repository:
 [source, subs="+attributes"]
 apk add {script-name}
 
-IMPORTANT: This package is in Alpine stable since v3.7. You can also install it from _edge_ (unstable) branch.
-
 
 === Fedora
 
