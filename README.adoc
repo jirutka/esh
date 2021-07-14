@@ -43,6 +43,12 @@ apk add {script-name}
 dnf install {script-name}
 
 
+=== Void Linux
+
+[source, subs="+attributes"]
+xbps-install {script-name}
+
+
 === On CI
 
 You can add {script-name} as a submodule into your repository or download it on demand, e.g.:
