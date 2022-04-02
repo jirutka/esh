@@ -1,3 +1,4 @@
 Content from the file incl/a.esh: This is file incl/a.esh.
 Variable var1=42.
+Content from the file incl/a.esh: already included once.
 The main file continues.

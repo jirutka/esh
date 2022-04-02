@@ -101,6 +101,9 @@ Please note that includes are processed during the conversion, not the evaluatio
 +
 Unlike the others, this tag must be closed on the same line, otherwise it's a syntax error.
 
+<%+1 filename %>::
+Same as _<%+_ with _once_ semantics i.e. it will simply skip the entire tag if the _filename_ has already been referenced before.
+
 <%# comment %>::
   Removed from the final output.
 
