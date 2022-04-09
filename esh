@@ -360,7 +360,7 @@ if [ "${OUTPUT#-}" ]; then
 	tmpfile="$(mktemp)"
 	trap "rm -f '$tmpfile'" EXIT HUP INT TERM
 	process "$INPUT" "$vars" "$EVALUATE" > "$tmpfile"
-	mv "$tmpfile" "$OUTPUT"
+	cat "$tmpfile" > "$OUTPUT"
 else
 	process "$INPUT" "$vars" "$EVALUATE"
 fi
