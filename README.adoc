@@ -29,6 +29,9 @@ esh is implemented in ~290 lines (LoC) of shell and awk.
 
 == Installation
 
+image::https://repology.org/badge/vertical-allrepos/esh-shell-template-engine.svg?columns=4[Packaging status, align=center, link=https://repology.org/project/esh-shell-template-engine/versions]
+
+
 === Alpine Linux
 
 Install package *{script-name}* from the Alpine’s community repository:
