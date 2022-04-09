@@ -1,9 +1,9 @@
 = ESH – Embedded SHell
 :source-language: sh
 :script-name: esh
-:script-sha1: ad5dfa4a8971d66dd563dff3c63c8241878d5108
+:script-sha1: 9084e3e8e70e4ea81c40cd1cf85559196c0fa2cc
 :gh-name: jirutka/{script-name}
-:version: 0.3.1
+:version: 0.3.2
 
 ifdef::env-github[]
 image:https://github.com/{gh-name}/workflows/CI/badge.svg[Build Status, link=https://github.com/{gh-name}/actions?query=workflow%3A%22CI%22]

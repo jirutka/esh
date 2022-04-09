@@ -41,7 +41,7 @@
 set -eu
 
 readonly PROGNAME='esh'
-readonly VERSION='0.3.1'
+readonly VERSION='0.3.2'
 readonly SCRIPTPATH="$0"
 
 AWK_CONVERTER=$(cat <<'AWK'
