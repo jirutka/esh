@@ -119,6 +119,8 @@ Opening and closing tag may not be at the same line.
 Text outside a tag becomes literal text, but it is subject to any tagged shell code surrounding it.
 For example, text surrounded by a tagged *if* statement only appears in the output if the condition is true.
 
+If the first line of the template starts with `#!/usr/bin/env esh`, this line will be removed from the output (since 0.4.0).
+
 
 == EXAMPLES
 

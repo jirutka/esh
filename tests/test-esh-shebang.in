@@ -1,0 +1,2 @@
+#!/usr/bin/env esh
+Hello from <%= ${TEST_NAME#test-} %>!

@@ -1,0 +1,2 @@
+#! /usr/bin/env esh
+This line is included from incl/esh-shebang.esh
