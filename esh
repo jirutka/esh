@@ -83,7 +83,7 @@ function flush(len,  _str) {
 	_str = read(len)
 
 	if (state == "TEXT") {
-		gsub("'", "'\\''", _str)
+		gsub("'", "'\"'\"'", _str)
 	}
 	if (state != "COMMENT") {
 		fputs(_str)
