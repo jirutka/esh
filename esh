@@ -145,6 +145,9 @@ function end_text() {
 	state = "UNDEF"
 }
 function process_line() {
+	if (linenos[depth] == 0 && match(buff, "^#! */usr/bin/env esh([ \t]|$)")) {
+		return
+	}
 	print_nl = 1
 	linenos[depth]++
 

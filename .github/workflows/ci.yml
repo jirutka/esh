@@ -13,20 +13,21 @@ jobs:
           - shell: /bin/dash
           - shell: /bin/bash
           - shell: /bin/zsh
-          - awk: /usr/bin/original-awk
-          - awk: /usr/lib/freebsd/awk
+          - awk: /usr/bin/gawk
+          - awk: /usr/bin/mawk
+          - awk: /usr/bin/nawk
           - os: macos-latest
             shell: /bin/sh
           - os: macos-latest
             shell: /bin/bash
-    runs-on: ${{ matrix.os || 'ubuntu-20.04' }}
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     env:
       ESH_SHELL: ${{ matrix.shell }}
       ESH_AWK: ${{ matrix.awk }}
     steps:
       - uses: actions/checkout@v2
 
-      - run: sudo apt-get install freebsd-glue original-awk zsh
-        if: runner.os == 'Linux'
+      - run: sudo apt-get install zsh
+        if: runner.os == 'Linux' && matrix.shell == '/bin/zsh'
 
       - run: make test

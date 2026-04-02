@@ -1,0 +1,2 @@
+#!/usr/bin/env esh
+<%+ incl/esh-shebang.esh %>.
